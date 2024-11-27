@@ -15,8 +15,8 @@
             <form action="app/controllers/login.php" method="POST">
                 <!-- Usuario -->
                 <div class="mb-3">
-                    <label for="usuario" class="form-label">Usuario</label>
-                    <input type="text" class="form-control" id="usuario" name="usuario" placeholder="Ingresa tu usuario" required>
+                    <label for="usuario" class="form-label">Correo Electrónico</label>
+                    <input type="email" class="form-control" id="usuario" name="usuario" placeholder="Ingresa tu correo electrónico" required>
                 </div>
                 <!-- Contraseña -->
                 <div class="mb-3">
