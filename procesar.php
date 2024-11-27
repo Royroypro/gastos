@@ -1,5 +1,7 @@
 <?php
 
+header('Content-Type: application/json');
+
 // Incluir el archivo de conexión a la base de datos
 include 'app/config.php';
 include 'sesion.php';
@@ -43,24 +45,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // Obtener el último ID insertado
         $id_transaccion = $pdo->lastInsertId();
-        echo "Transacción insertada correctamente con ID: $id_transaccion<br>";
 
         // Procesar y guardar la imagen si se ha subido
         if (isset($_FILES['foto']) && $_FILES['foto']['error'] == 0) {
             $directorio = 'imgs/';
             // Verificar si la carpeta 'imgs' existe y tiene permisos de escritura
             if (!file_exists($directorio)) {
-                echo "La carpeta 'imgs' no existe, creando...<br>";
                 mkdir($directorio, 0777, true);
-                echo "Carpeta 'imgs' creada correctamente.<br>";
             }
 
             if (is_writable($directorio)) {
-                $nombre_imagen = $id_transaccion . '-' . $id_usuario . '_' . $tipo . '.' . pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
                 $nombre_imagen = $id_transaccion . '-' . $id_usuario . '_' . $tipo . '.jpg';
                 $ruta_destino = $directorio . $nombre_imagen;
-
-                echo "Intentando mover el archivo a la ruta: $ruta_destino<br>";
 
                 if (move_uploaded_file($_FILES['foto']['tmp_name'], $ruta_destino)) {
                     // Actualizar la transacción con la ruta de la imagen
@@ -69,30 +65,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         ':imagenes' => $nombre_imagen,
                         ':id_transaccion' => $id_transaccion
                     ]);
-                    echo "Imagen guardada con éxito: " . $ruta_destino . "<br>";
-                } else {
-                    echo "Error al mover la imagen. Error de PHP: " . $_FILES['foto']['error'] . "<br>";
                 }
-            } else {
-                echo "No se puede escribir en la carpeta 'imgs'.<br>";
             }
-        } else {
-            echo "No se ha subido una imagen válida. Asegurate de que sea un archivo de imagen válido (jpg, png, gif, etc.).<br>";
-            echo "No se ha subido una imagen válida.<br>";
         }
-        
-header('Location: index.php');
-exit;
+
+        // Mostrar el resultado en formato JSON
+        echo json_encode([
+            'ok' => true,
+            'id_transaccion' => $id_transaccion
+        ]);
 
     } catch (PDOException $e) {
-        // Mostrar el error de PDO (base de datos)
-        echo "Error al guardar la transacción en la base de datos: " . $e->getMessage() . "<br>";
+        echo json_encode([
+            'ok' => false,
+            'error' => $e->getMessage()
+        ]);
     } catch (Exception $e) {
-        // Capturar cualquier otro error
-        echo "Error inesperado: " . $e->getMessage() . "<br>";
+        echo json_encode([
+            'ok' => false,
+            'error' => $e->getMessage()
+        ]);
     }
 }
     
 ?>
-
 

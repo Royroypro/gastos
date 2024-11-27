@@ -27,95 +27,158 @@ include_once 'sesion.php';
         <!-- Formulario para agregar transacciones -->
         <section class="form-section mb-5">
             <h2 class="text-center mb-4">Registrar Transacción</h2>
-            <form id="transaction-form" action="procesar.php" method="POST" class="row g-3 needs-validation" enctype="multipart/form-data" style="max-width: 600px; margin: 0 auto;">
+            <section class="form-section mb-5">
+    <h2 class="text-center mb-4">Registrar Transacción</h2>
+    <form id="transaction-form" class="row g-3 needs-validation" enctype="multipart/form-data" style="max-width: 600px; margin: 0 auto;">
+        <div class="col-md-6">
+            <label for="tipo" class="form-label">Tipo:</label>
+            <select name="tipo" id="tipo" class="form-select" required onchange="showCategory(this)">
+                <option value="" selected>--Seleccionar--</option>
+                <option value="Gasto">Gasto</option>
+                <option value="Ingreso">Ingreso</option>
+            </select>
+        </div>
 
-                <div class="col-md-6">
-                    <label for="tipo" class="form-label">Tipo:</label>
-                    <select name="tipo" id="tipo" class="form-select" required onchange="showCategory(this)">
-                        <option value="" selected>--Seleccionar--</option>
-                        <option value="Gasto">Gasto</option>
-                        <option value="Ingreso">Ingreso</option>
-                    </select>
-                </div>
-
-                <div id="categoria_gasto" class="col-md-6" style="display: none;">
-                    <label for="categoria_gasto" class="form-label">Categoría Gastos:</label>
-                    <select name="categoria_gasto" id="categoria_gasto" class="form-select" required>
-                        <option value="" selected>--Seleccionar--</option>
-                        <?php
+        <div id="categoria_gasto" class="col-md-6" style="display: none;">
+            <label for="categoria_gasto" class="form-label">Categoría Gastos:</label>
+            <select name="categoria_gasto" id="categoria_gasto_input" class="form-select">
+                <option value="" selected>--Seleccionar--</option>
+                <?php
                             $stmt = $pdo->prepare("SELECT * FROM categorias_gastos ORDER BY nombre");
                             $stmt->execute();
                             while($categoria = $stmt->fetch()){
                                 echo "<option value='$categoria[id_categoria]'>$categoria[nombre]</option>";
                             }
                         ?>
-                    </select>
-                </div>
+            </select>
+        </div>
 
-                <div id="categoria_entrada" class="col-md-6" style="display: none;">
-                    <label for="categoria_entrada" class="form-label">Categoría Entradas:</label>
-                    <select name="categoria_entrada" id="categoria_entrada" class="form-select" required>
-                        <?php
+        <div id="categoria_entrada" class="col-md-6" style="display: none;">
+            <label for="categoria_entrada" class="form-label">Categoría Entradas:</label>
+            <select name="categoria_entrada" id="categoria_entrada_input" class="form-select">
+                <option value="" selected>--Seleccionar--</option>
+                <!-- PHP dynamic options -->
+                <?php
                             $stmt = $pdo->prepare("SELECT * FROM categorias_entradas ORDER BY nombre");
                             $stmt->execute();
                             while($categoria = $stmt->fetch()){
                                 echo "<option value='$categoria[id_categoria]'>$categoria[nombre]</option>";
                             }
                         ?>
-                    </select>
-                </div>
+            </select>
+        </div>
 
-                <script>
-                    function showCategory(select) {
-                        if (select.value == 'Ingreso') {
-                            document.getElementById('categoria_gasto').style.display = 'none';
-                            document.getElementById('categoria_entrada').style.display = 'block';
-                        } else {
-                            document.getElementById('categoria_gasto').style.display = 'block';
-                            document.getElementById('categoria_entrada').style.display = 'none';
-                        }
-                    }
-                </script>
+        <div class="col-md-6">
+            <label for="monto" class="form-label">Monto S/:</label>
+            <input type="number" name="monto" id="monto" step="0.01" class="form-control" required>
+        </div>
 
-                <div class="col-md-6">
-                    <label for="monto" class="form-label">Monto S/:</label>
-                    <input type="number" name="monto" id="monto" step="0.01" class="form-control" required>
-                </div>
+        <div class="col-md-6">
+            <label for="fecha" class="form-label">Fecha y Hora:</label>
+            <input type="datetime-local" name="fecha" id="fecha" class="form-control" required value="<?php echo date('Y-m-d\TH:i'); ?>">
+        </div>
 
-                <div class="col-md-6">
-                    <label for="fecha" class="form-label">Fecha y Hora:</label>
-                    <input type="datetime-local" name="fecha" id="fecha" class="form-control" required value="<?php echo date('Y-m-d\TH:i'); ?>">
-                </div>
+        <div class="col-12">
+            <label for="descripcion" class="form-label">Descripción:</label>
+            <textarea name="descripcion" id="descripcion" rows="3" class="form-control"></textarea>
+        </div>
+        
+        <div class="col-12">
+            <label for="foto" class="form-label">Foto (Opcional):</label>
+            <input type="file" name="foto" id="foto" class="form-control" accept="image/*" onchange="previewImage(this)">
+            <img id="preview" src="" alt="Vista previa de la imagen" style="max-width: 200px; margin-top: 10px;">
+        </div>
 
-                <div class="col-12">
-                    <label for="descripcion" class="form-label">Descripción:</label>
-                    <textarea name="descripcion" id="descripcion" rows="3" class="form-control"></textarea>
-                </div>
-                
-                <div class="col-12">
-                    <label for="foto" class="form-label">Foto (Opcional):</label>
-                    <input type="file" name="foto" id="foto" class="form-control" accept="image/*" onchange="previewImage(this)">
-                    <img id="preview" src="" alt="Vista previa de la imagen" style="max-width: 200px; margin-top: 10px;">
-                </div>
+        <div class="col-12 text-center">
+            <button type="submit" class="btn btn-primary w-50 mt-3">Guardar</button>
+        </div>
+    </form>
+</section>
 
-                <script>
-                    function previewImage(input) {
-                        const preview = document.getElementById('preview');
-                        const file = input.files[0];
-                        const reader = new FileReader();
+<script>
+    const formData = {};
 
-                        reader.onload = function(e) {
-                            preview.src = e.target.result;
-                        };
+    // Listen for changes in all inputs
+    document.querySelectorAll('#transaction-form input, #transaction-form select, #transaction-form textarea').forEach(element => {
+        element.addEventListener('input', (event) => {
+            formData[event.target.name] = event.target.value;
+            console.log('Updated formData:', formData);
+        });
 
-                        reader.readAsDataURL(file);
-                    }
-                </script>
+        element.addEventListener('change', (event) => {
+            formData[event.target.name] = event.target.value;
+            console.log('Updated formData:', formData);
+        });
+    });
 
-                <div class="col-12 text-center">
-                    <button type="submit" class="btn btn-primary w-50 mt-3">Guardar</button>
-                </div>
-            </form>
+    // Handle preview image separately
+    function previewImage(input) {
+        const preview = document.getElementById('preview');
+        const file = input.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            formData[input.name] = e.target.result; // Save base64 image
+            console.log('Updated formData with image:', formData);
+        };
+
+        reader.readAsDataURL(file);
+    }
+
+    // Intercept form submission
+    const form = document.getElementById('transaction-form');
+    form.addEventListener('submit', (event) => {
+        event.preventDefault(); // Prevent default submission
+
+       
+                 // Prepare and send formData to procesar.php
+        const formData = new FormData(form);
+        fetch('procesar.php', {
+            method: 'POST',
+            body: formData
+        }).then(response => response.json())
+        .then(data => {
+            if (data.ok) {
+                alert('Transacción registrada correctamente, ID: ' + data.id_transaccion);
+                window.location.href = 'index.php';
+                form.reset();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+
+        
+
+        // Uncomment below for AJAX POST submission
+        // fetch('procesar.php', {
+        //     method: 'POST',
+        //     headers: { 'Content-Type': 'application/json' },
+        //     body: JSON.stringify(formData)
+        // }).then(response => response.json())
+        //   .then(data => console.log(data))
+        //   .catch(error => console.error('Error:', error));
+    });
+
+    // Show/hide category fields
+    function showCategory(select) {
+        const categoriaGasto = document.getElementById('categoria_gasto');
+        const categoriaEntrada = document.getElementById('categoria_entrada');
+
+        if (select.value === 'Ingreso') {
+            categoriaGasto.style.display = 'none';
+            categoriaEntrada.style.display = 'block';
+        } else if (select.value === 'Gasto') {
+            categoriaGasto.style.display = 'block';
+            categoriaEntrada.style.display = 'none';
+        } else {
+            categoriaGasto.style.display = 'none';
+            categoriaEntrada.style.display = 'none';
+        }
+    }
+</script>
+
         </section>
 
         <!-- Tabla para mostrar transacciones -->
@@ -173,16 +236,16 @@ include_once 'sesion.php';
                             while($transaccion = $stmt->fetch()){
                                 $categoria = !empty($transaccion['categoria_gasto']) ? $transaccion['categoria_gasto'] : $transaccion['categoria_entrada'];
                                 $imagen = !empty($transaccion['imagenes']) ? $transaccion['imagenes'] : 'no-image.png';
-                                $color = $transaccion['tipo'] == 'Ingreso' ? 'green' : 'red';
+                                $color = ($transaccion['tipo'] == 'Ingreso') ? 'green' : 'red';
                                 echo "<tr data-id-transaccion='{$transaccion['id_transaccion']}'>
                                     <td>" . ($stmt->rowCount() - $counter + 1) . "</td>
-                                    <td style='color: {$color};'>{$transaccion['tipo']}</td>
+                                    <td>{$transaccion['tipo']}</td>
                                     <td>{$categoria}</td>
-                                    <td style='color: {$color};'>S/ {$transaccion['monto']}</td>
+                                    <td style='color:{$color};'>S/ {$transaccion['monto']}</td>
                                     <td>S/ {$transaccion['saldo_actual']}</td>
                                     <td>{$transaccion['fecha_registro']}</td>
                                     <td>{$transaccion['descripcion']}</td>
-                                    <td style='display:none;'><img src='imgs/{$imagen}' alt='Imagen de la transacción' style='max-width: 200px;'></td>
+                                    <td style='display:none;'><img src='imgs/{$imagen}' alt='Imagen de la transacci&oacute;n' style='max-width: 200px;'></td>
                                     <td>
                                         <button class='btn btn-warning btn-sm' onclick='handleEdit(this)'>Mas</button>
                                         <button class='btn btn-danger btn-sm' onclick='handleDelete(this)'>Eliminar</button>
