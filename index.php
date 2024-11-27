@@ -173,11 +173,12 @@ include_once 'sesion.php';
                             while($transaccion = $stmt->fetch()){
                                 $categoria = !empty($transaccion['categoria_gasto']) ? $transaccion['categoria_gasto'] : $transaccion['categoria_entrada'];
                                 $imagen = !empty($transaccion['imagenes']) ? $transaccion['imagenes'] : 'no-image.png';
+                                $color = $transaccion['tipo'] == 'Ingreso' ? 'green' : 'red';
                                 echo "<tr data-id-transaccion='{$transaccion['id_transaccion']}'>
                                     <td>" . ($stmt->rowCount() - $counter + 1) . "</td>
-                                    <td>{$transaccion['tipo']}</td>
+                                    <td style='color: {$color};'>{$transaccion['tipo']}</td>
                                     <td>{$categoria}</td>
-                                    <td>S/ {$transaccion['monto']}</td>
+                                    <td style='color: {$color};'>S/ {$transaccion['monto']}</td>
                                     <td>S/ {$transaccion['saldo_actual']}</td>
                                     <td>{$transaccion['fecha_registro']}</td>
                                     <td>{$transaccion['descripcion']}</td>
